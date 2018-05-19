@@ -1,16 +1,13 @@
-FROM jenkins:2.32.3
+# use a node base image
+FROM node:7-onbuild
 
-COPY plugins.txt /usr/share/jenkins/plugins.txt
-RUN /usr/local/bin/plugins.sh /usr/share/jenkins/plugins.txt
+# set maintainer
+LABEL maintainer "rautdeepak55@gmail.com"
 
-# copy custom built plugins
-COPY plugins/*.hpi /usr/share/jenkins/ref/plugins/
+# set a health check
+HEALTHCHECK --interval=5s \
+            --timeout=5s \
+            CMD curl -f http://172.20.10.3:8080 || exit 1
 
-# so we can use jenkins cli
-COPY config/jenkins.properties /usr/share/jenkins/ref/
-
-# remove executors in master
-COPY config/*.groovy /usr/share/jenkins/ref/init.groovy.d/
-
-# lets configure Jenkins with some defaults
-COPY config/*.xml /usr/share/jenkins/ref/
+# tell docker what port to expose
+EXPOSE 8080
